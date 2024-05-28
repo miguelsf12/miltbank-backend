@@ -4,6 +4,7 @@ const getUserByToken = require('../helpers/get-user-by-token')
 const User = require('../models/User')
 const Transference = require('../models/Transference')
 const jwt = require('jsonwebtoken')
+const hideCpf = require('../helpers/hide-cpf')
 const { ObjectId } = require('mongoose').Types
 
 module.exports = class PaymentController {
@@ -88,17 +89,7 @@ module.exports = class PaymentController {
         return res.status(400).json({ message: 'Chave PIX inválida' })
       }
 
-      function ocultarCPF(cpf) {
-        const partes = cpf.split('-')
-        const numeros = partes[0].split('.')
-
-        numeros[0] = '***'
-        partes[1] = '**'
-
-        return `${numeros.join('.')}-${partes[1]}`
-      }
-
-      const cpfOculto = ocultarCPF(userReceiver.cpf)
+      const cpfOculto = hideCpf(userReceiver.cpf)
 
       userReceiver.cpf = cpfOculto
 
@@ -214,6 +205,11 @@ module.exports = class PaymentController {
       if (!transference) {
         return res.status(404).json({ message: 'Transferência não encontrada!' })
       }
+      const cpfOcultoPayer = hideCpf(transference.payer.cpf)
+      const cpfOcultoReceiver = hideCpf(transference.receiver.cpf)
+
+      transference.payer.cpf = cpfOcultoPayer
+      transference.receiver.cpf = cpfOcultoReceiver
 
       res.status(200).send(transference)
     } catch (error) {
