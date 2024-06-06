@@ -170,7 +170,7 @@ module.exports = class UserController {
 
     user.address = address
 
-    // validations
+    // email validation
     const userExists = await User.findOne({ email: email })
     if (user.email !== email && userExists) {
       res.status(422).json({ message: 'Por favor, utilize outro e-mail!' })
@@ -179,6 +179,7 @@ module.exports = class UserController {
 
     user.email = email
 
+    // password validation
     if (password != confirmPassword) {
       res.status(422).json({ message: 'As senhas não conferem!' })
       return
