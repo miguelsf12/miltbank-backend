@@ -124,8 +124,8 @@ module.exports = class UserController {
       currentUser.password = undefined
 
       if (typeof currentUser.amount === 'number') {
-        const formattedAmount = currentUser.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        currentUser.amount = formattedAmount;
+        const formattedAmount = currentUser.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+        currentUser.amount = formattedAmount
       }
     } else {
       currentUser = null
@@ -150,43 +150,61 @@ module.exports = class UserController {
   }
 
   static async editUser(req, res) {
-    const id = req.params.id
-
     // checar se usuário existe
     const token = getToken(req)
     const user = await getUserByToken(token)
 
-    // O Address ja vem como um objeto, pois ele é retornado da api depois de ser passado o CEP
-    const { email, password, confirmPassword, cep, logradouro, complemento, bairro, localidade, uf } = req.body
-
-    const address = {
-      cep,
-      logradouro,
-      complemento,
-      bairro,
-      localidade,
-      uf,
+    if (!user) {
+      res.status(422).json({
+        message: 'Usuário não encontrado!'
+      })
+      return
     }
 
-    user.address = address
+    const userModified = req.body
+    console.log(userModified)
+
+    // telefone validation
+    if (userModified.telefone) {
+      const userExistsTel = await User.findOne({ telefone: userModified.telefone })
+      if (user.telefone !== userModified.telefone && userExistsTel) {
+        res.status(422).json({ message: 'Por favor, utilize outro número!' })
+        return
+      } else if (userModified.telefone) {
+        user.telefone = userModified.telefone
+        if (user.pix.tipo === 'telefone') {
+          user.pix.chave = user.telefone
+        }
+      }
+    }
 
     // email validation
-    const userExists = await User.findOne({ email: email })
-    if (user.email !== email && userExists) {
-      res.status(422).json({ message: 'Por favor, utilize outro e-mail!' })
-      return
+    if (userModified.email) {
+      const userExistsMail = await User.findOne({ email: userModified.email })
+      if (user.email !== userModified.email && userExistsMail) {
+        res.status(422).json({ message: 'Por favor, utilize outro e-mail!' })
+        return
+      } else if (userModified.email) {
+        user.email = userModified.email
+        if (user.pix.tipo === 'email') {
+          user.pix.chave = user.email
+        }
+      }
     }
 
-    user.email = email
+    // Atualizar endereço
+    if (userModified.address) {
+      user.address = userModified.address;
+    }
 
     // password validation
-    if (password != confirmPassword) {
+    if (userModified.newPassword != userModified.confirmNewPassword) {
       res.status(422).json({ message: 'As senhas não conferem!' })
       return
-    } else if (password === confirmPassword && password != null) {
+    } else if (userModified.newPassword === userModified.confirmNewPassword && userModified.newPassword != null) {
       // creating password
       const salt = await bcrypt.genSalt(12)
-      const passwordHash = await bcrypt.hash(password, salt)
+      const passwordHash = await bcrypt.hash(userModified.newPassword, salt)
 
       user.password = passwordHash
     }
