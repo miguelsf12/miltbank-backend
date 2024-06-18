@@ -161,8 +161,12 @@ module.exports = class UserController {
       return
     }
 
+    if (req.file) {
+      user.image = req.file.filename
+    }
+
     const userModified = req.body
-    console.log(userModified)
+    // console.log(userModified)
 
     // telefone validation
     if (userModified.telefone) {
@@ -253,7 +257,7 @@ module.exports = class UserController {
 
     try {
       // achar usuário
-      const user = await User.findOne({ name, cpf, email })
+      const user = await User.findOne({ name, cpf, email }).select('-password')
       console.log(user)
 
       if (!user) {
