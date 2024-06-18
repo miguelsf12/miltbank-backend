@@ -59,6 +59,9 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  image: {
+    type: String
+  },
   amount: {
     type: Number,
     default: 1300.20,
