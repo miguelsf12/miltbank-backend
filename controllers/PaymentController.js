@@ -66,8 +66,6 @@ module.exports = class PaymentController {
     const user = await getUserByToken(token)
     const receiver = await getReceiver(key)
 
-    // console.log(receiver)
-
     if (!receiver) {
       return res.status(400).json({ message: 'Chave PIX inválida' })
     }
