@@ -166,7 +166,7 @@ module.exports = class UserController {
     }
 
     const userModified = req.body
-    // console.log(userModified)
+    console.log(userModified)
 
     // telefone validation
     if (userModified.telefone) {
