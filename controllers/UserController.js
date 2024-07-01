@@ -10,16 +10,6 @@ const getToken = require('../helpers/get-token')
 module.exports = class UserController {
   static async register(req, res) {
     const { name, birth_date, cpf, email, password, confirmPassword } = req.body
-    const { cep, logradouro, complemento, bairro, localidade, uf, } = req.body
-
-    const address = {
-      cep,
-      logradouro,
-      complemento,
-      bairro,
-      localidade,
-      uf,
-    }
 
     // Validação
     const fieldsToValidate = {
@@ -68,7 +58,6 @@ module.exports = class UserController {
       birth_date,
       cpf,
       email,
-      address,
       password: passwordHash
     })
 
