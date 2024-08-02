@@ -1,7 +1,7 @@
 const mongoose = require('../db/conn')
-const generateEightDigitNumber = require('../helpers/generateNumbers');
+const generateEightDigitNumber = require('../helpers/generateNumbers')
 
-const { Schema } = mongoose;
+const { Schema } = mongoose
 
 const AddressSchema = new Schema({
   cep: {
@@ -34,6 +34,19 @@ const PixSchema = new Schema({
   }
 }, { _id: false })
 
+
+const WalletSchema = new Schema({
+  coins: [{
+    symbol: {
+      type: String,
+    },
+    amount: {
+      type: Number,
+    }
+  }]
+}, { _id: false })
+
+
 const UserSchema = new Schema({
   name: {
     type: String,
@@ -65,6 +78,10 @@ const UserSchema = new Schema({
     type: Number,
     default: 1300.20,
   },
+  wallet: {
+    type: WalletSchema,
+    default: { coins: {} }
+  },
   address: AddressSchema,
   pix: PixSchema,
   numberOfAccount: {
@@ -72,32 +89,32 @@ const UserSchema = new Schema({
     unique: true,
     validate: {
       validator: (v) => {
-        return /^(\d{8}-1)$/.test(v);
+        return /^(\d{8}-1)$/.test(v)
       },
       message: props => `${props.value} não é um número de conta válido!`
     }
   }
-}, { timestamps: true });
+}, { timestamps: true })
 
 // Adicionando um hook beforeSave para gerar e verificar o número de conta no momento da criação
 UserSchema.pre('save', async function (next) {
-  if (!this.isNew) return next(); // Se o usuário já existir, não gerar novo número de conta
+  if (!this.isNew) return next() // Se o usuário já existir, não gerar novo número de conta
 
-  let generatedNumber;
-  let existingUser;
+  let generatedNumber
+  let existingUser
 
   do {
-    generatedNumber = `${generateEightDigitNumber()}-1`;
+    generatedNumber = `${generateEightDigitNumber()}-1`
     // Verificar se o número gerado já existe no banco de dados
-    existingUser = await this.constructor.findOne({ numberOfAccount: generatedNumber });
+    existingUser = await this.constructor.findOne({ numberOfAccount: generatedNumber })
     // Se existir, gere outro número
-  } while (existingUser);
+  } while (existingUser)
 
   // Atribuir o número de conta único ao usuário
-  this.numberOfAccount = generatedNumber;
-  next();
-});
+  this.numberOfAccount = generatedNumber
+  next()
+})
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema)
 
-module.exports = User;
+module.exports = User

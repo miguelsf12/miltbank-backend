@@ -15,7 +15,7 @@ app.use(express.static('public'))
 // Routes
 const UserRoutes = require('./routes/userRoutes')
 const PaymentRoutes = require('./routes/paymentRoutes')
-const ExchangeRoutes = require('./routes/ExchangeRoutes')
+const ExchangeRoutes = require('./routes/exchangeRoutes')
 
 app.use('/users', UserRoutes)
 app.use('/payments', PaymentRoutes)

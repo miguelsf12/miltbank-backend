@@ -6,11 +6,11 @@ const Exchange = mongoose.model(
   'Exchange',
   new Schema({
     amountInForeignCurrency: {
-      type: String,
+      type: Number,
       required: true
     },
     amountPaidInReais: {
-      type: String,
+      type: Number,
       required: true
     },
     coin: {
