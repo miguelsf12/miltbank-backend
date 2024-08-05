@@ -33,7 +33,7 @@ module.exports = class UserController {
       return
     }
 
-    // Checar se usuário existe
+    // Checar se o usuário existe
     const userEmail = await User.findOne({ email: email })
     const userCpf = await User.findOne({ cpf: cpf })
 
